@@ -68,9 +68,9 @@ class LogsSetup:
     def _filter_logs_by_time(self, from_time: Optional[Time] = None, to_time: Optional[Time] = None) -> List[str]:
         """Filter logs based on time range."""
         from_datetime, to_datetime = self._convert_time_to_datetime(from_time, to_time)
-        for log_map in self.log_map:
+        for log_map, lines in self.log_map.items():
             filtered_logs = []
-            for line in self.log_lines:
+            for line in lines:
                 log_time = parse_log_time(line)
                 if log_time and from_datetime <= log_time <= to_datetime:
                     filtered_logs.append(line)
@@ -94,7 +94,7 @@ class LogsSetup:
         self.log_map = log_map
 
     def _save_to_files(self):
-        Path("./processed")
+        Path("./processed").mkdir(parents=True, exist_ok=True)
         for container_name, log_lines in self.log_map.items():
             with open(f"./processed/{container_name}.log", "w") as f:
                 f.writelines(log_lines)
